@@ -1,10 +1,9 @@
 package view;
 
-import rasterize.RasterBufferedImage;
+import raster.RasterBufferedImage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class Panel extends JPanel {
 

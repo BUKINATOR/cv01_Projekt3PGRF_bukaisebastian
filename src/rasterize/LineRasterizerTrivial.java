@@ -1,5 +1,8 @@
 package rasterize;
 
+import model.Line;
+import raster.RasterBufferedImage;
+
 public class LineRasterizerTrivial extends LineRasterizer {
     public LineRasterizerTrivial(RasterBufferedImage raster) {
         super(raster);
@@ -11,12 +14,9 @@ public class LineRasterizerTrivial extends LineRasterizer {
         float q = y1 - k * x1;
 
         // TODO: x1 může být větší než x1
-        for(int x = x1; x <= x2; x++){
+        for (int x = x1; x <= x2; x++) {
             int y = Math.round(k * x + q);
             raster.setPixel(x, y, 0xff0000);
         }
-
-        // TODO: dokončit
-
     }
 }

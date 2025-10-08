@@ -1,5 +1,7 @@
 package rasterize;
 
+import raster.RasterBufferedImage;
+
 import java.awt.*;
 
 public class LineRasterizerGraphics extends LineRasterizer {
