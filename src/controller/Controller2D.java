@@ -86,7 +86,6 @@ public class Controller2D {
             seedFiller.fill();
         }
 
-
         panel.repaint();
     }
 }
