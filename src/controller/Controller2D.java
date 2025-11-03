@@ -1,29 +1,31 @@
 package controller;
 
 
+import clip.Clipper;
 import fill.Filler;
+import fill.ScanLineFiller;
 import fill.SeedFiller;
 import model.Line;
 import model.Point;
 import model.Polygon;
-import rasterize.LineRasterizer;
-import rasterize.LineRasterizerColorTransition;
-import rasterize.LineRasterizerGraphics;
-import rasterize.LineRasterizerTrivial;
+import rasterize.*;
 import view.Panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Controller2D {
     private final Panel panel;
     private int color = 0xffffff;
 
     private LineRasterizer lineRasterizer;
+    private PolygonRasterizer polygonRasterizer;
 
     // To draw
     private Polygon polygon = new Polygon();
+    private Polygon polygonClipper = new Polygon();
 
     private Filler seedFiller;
     private Point seedFillerStartPoint;
@@ -40,6 +42,7 @@ public class Controller2D {
         //lineRasterizer = new LineRasterizerColorTransition(panel.getRaster());
         //lineRasterizer = new LineRasterizerTrivial(panel.getRaster());
         lineRasterizer = new LineRasterizerGraphics(panel.getRaster());
+        polygonRasterizer = new PolygonRasterizer(lineRasterizer);
 
         initListeners();
     }
@@ -49,22 +52,16 @@ public class Controller2D {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
-//             Ukázka zapamatování si seznamu úseček
-                    if (!isLineStartSet) {
-                        startX = e.getX();
-                        startY = e.getY();
-                        isLineStartSet = true;
-                        return;
-                    }
-
-                    isLineStartSet = false;
-                    Line line = new Line(startX, startY, e.getX(), e.getY());
-                    lines.add(line);
+                    polygonClipper.addPoint(new Point(e.getX(), e.getY()));
                 }
 
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    seedFillerStartPoint = new Point(e.getX(), e.getY());
+                    polygon.addPoint(new Point(e.getX(), e.getY()));
                 }
+
+//                if (e.getButton() == MouseEvent.BUTTON3) {
+//                    seedFillerStartPoint = new Point(e.getX(), e.getY());
+//                }
 
                 drawScene();
             }
@@ -76,15 +73,25 @@ public class Controller2D {
     private void drawScene() {
         panel.getRaster().clear();
 
-//      Ukázka zapamatování si seznamu úseček
-        for (Line line : lines)
-            lineRasterizer.rasterize(line);
+        // rasterizuju ořezávací i ořezávaný polygon
+        polygonRasterizer.rasterize(polygonClipper);
+        polygonRasterizer.rasterize(polygon);
+
+        // Provedu ořezání
+        Clipper clipper = new Clipper();
+        List<Point> clippedPoints = clipper.clip(polygonClipper.getPoints(), polygon.getPoints());
+
+        // Použiju scanline na výsledek ořezání
+        Filler scanLine = new ScanLineFiller(lineRasterizer, polygonRasterizer, new Polygon(new ArrayList<>(clippedPoints)));
+        scanLine.fill();
+
+
 
         // použít seed filler
-        if (seedFillerStartPoint != null) {
-            seedFiller = new SeedFiller(panel.getRaster(), 0x00ff00, seedFillerStartPoint.getX(), seedFillerStartPoint.getY());
-            seedFiller.fill();
-        }
+//        if (seedFillerStartPoint != null) {
+//            seedFiller = new SeedFiller(panel.getRaster(), 0x00ff00, seedFillerStartPoint.getX(), seedFillerStartPoint.getY());
+//            seedFiller.fill();
+//        }
 
         panel.repaint();
     }

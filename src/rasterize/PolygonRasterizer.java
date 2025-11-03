@@ -1,5 +1,6 @@
 package rasterize;
 
+import model.Line;
 import model.Polygon;
 
 public class PolygonRasterizer {
@@ -19,14 +20,11 @@ public class PolygonRasterizer {
         // cyklus od i = 0 do konce seznamu pointů
         for (int i = 0; i < polygon.getSize(); i++) {
             int indexA = i;
-            int indexB = i + 1;
-            // jsemm na konci seznamu?
-
-            // ano - spojím poslední s nultým tzn. nastavím indexB = 0
+            int indexB = (i + 1) % polygon.getSize();
 
             // spojím pointy na indexu A a indexu B
-            // lineRasterizer.rasterize(line point na indexu A, point na index B);
-            // TODO: dodělat
+            Line line =new Line(polygon.getPoint(indexA), polygon.getPoint(indexB));
+            lineRasterizer.rasterize(line);
         }
 
     }
