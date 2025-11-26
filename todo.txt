@@ -1,0 +1,8 @@
+OK - Model (Solid) -> reprezentace, vertex buffer, index buffer (model space)
+- Model tranformation = model space -> world space
+- Nastavit kameru = view transformation = world space -> view space
+- Tranformace zobrazovacího objemu - Projection = view space -> soustava souřadnic ořezání
+- Ořezání
+- Dehomogenizace = x, y, z, w -> x/w, y/w, z/w, w/w = soustava souřadnic ořezání -> NDC
+OK - Tranformace do okna obrazovky = NDC -> douřadnice okna
+OK - Rasterizace

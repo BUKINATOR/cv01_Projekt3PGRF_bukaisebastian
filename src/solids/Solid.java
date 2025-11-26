@@ -3,6 +3,7 @@ package solids;
 import transforms.Point3D;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class Solid {
@@ -15,5 +16,9 @@ public abstract class Solid {
 
     public List<Integer> getIndexBuffer() {
         return indexBuffer;
+    }
+
+    protected void addIndices(Integer... indices) {
+        indexBuffer.addAll(Arrays.asList(indices));
     }
 }
