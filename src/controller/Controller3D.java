@@ -28,6 +28,7 @@ public class Controller3D {
     // Camera
     private Camera camera;
     private Mat4 proj;
+    private boolean perspective = true;
 
     public Controller3D(Panel panel) {
         this.panel = panel;
@@ -39,11 +40,7 @@ public class Controller3D {
                 .withZenith(Math.toRadians(-15))
                 .withFirstPerson(true);
 
-        proj = new Mat4PerspRH(
-                Math.toRadians(90),
-                panel.getRaster().getHeight() / (double) panel.getRaster().getWidth(),
-                0.1,
-                100);
+        proj = createPerspective();
 
         this.renderer = new Renderer(
                 lineRasterizer,
@@ -126,6 +123,12 @@ public class Controller3D {
                     activeSolidIndex = (activeSolidIndex + 1) % solids.size();
                 }
 
+                if (e.getKeyCode() == KeyEvent.VK_P) {
+                    perspective = !perspective;
+                    updateProjection();
+                    return;
+                }
+
                 if(e.getKeyCode() == KeyEvent.VK_W) {
                     camera = camera.forward(0.5);
                 }
@@ -196,6 +199,25 @@ public class Controller3D {
 
     private void scaleActive(double factor) {
         activeSolid().mulModel(new Mat4Scale(factor, factor, factor));
+    }
+
+    private Mat4 createPerspective() {
+        double aspect = panel.getRaster().getHeight() / (double) panel.getRaster().getWidth();
+        return new Mat4PerspRH(Math.toRadians(90), aspect, 0.1, 100);
+    }
+
+    private Mat4 createOrtho() {
+        double aspect = panel.getRaster().getHeight() / (double) panel.getRaster().getWidth();
+        double size = 2.5;
+        double w = size * 2;
+        double h = size * 2 * aspect;
+        return new Mat4OrthoRH(w, h, 0.1, 100);
+    }
+
+    private void updateProjection() {
+        proj = perspective ? createPerspective() : createOrtho();
+        renderer.setProj(proj);
+        drawScene();
     }
 
     private void drawScene() {

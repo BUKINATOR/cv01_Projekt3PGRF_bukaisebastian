@@ -31,7 +31,8 @@ public class Panel extends JPanel {
                 "R/F - rotace kolem Z, T/G - kolem X, Y/H - kolem Y",
                 "+/- - měřítko aktivního tělesa",
                 "W/S/A/D - pohyb kamery",
-                "Drag myší - rozhlížení kamery"
+                "Drag myší - rozhlížení kamery",
+                "P - přepínání projekce (persp/ortho)"
         };
 
         int padding = 8;
