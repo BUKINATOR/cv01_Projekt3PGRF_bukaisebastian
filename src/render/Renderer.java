@@ -45,7 +45,6 @@ public class Renderer {
             b = b.mul(proj);
 
             // TODO: ořezání
-
             // TODO: dehomogenizace - pozor na dělení 0
             // Clip space -> NDC
             a = a.mul(1 / a.getW());
