@@ -20,7 +20,7 @@ public class Controller3D {
     private Renderer renderer;
 
     // Solids
-    private Solid cube, pyramid, cylinder, arrow, axisX, axisY, axisZ, curve;
+    private Solid cube, pyramid, cylinder, arrow, axisX, axisY, axisZ, curveBezier, curveFerguson, curveCoons, parametricCurve;
     private final List<Solid> solids = new ArrayList<>();
     private int activeSolidIndex = 0;
     private int lastMouseX, lastMouseY;
@@ -59,7 +59,16 @@ public class Controller3D {
         cylinder.mulModel(new Mat4Transl(1.2, 0, 0));
 
         arrow = new Arrow();
-        curve = new Curve();
+        
+        // Kubiky zadané čtyřmi pevně zadanými body (transformovatelné modelovací maticí)
+        curveBezier = new Curve(Cubic.BEZIER);
+        curveFerguson = new Curve(Cubic.FERGUSON);
+        curveFerguson.mulModel(new Mat4Transl(2, 0, 0)); // počáteční transformace
+        curveCoons = new Curve(Cubic.COONS);
+        curveCoons.mulModel(new Mat4Transl(-2, 0, 0)); // počáteční transformace
+        
+        parametricCurve = new ParametricCurve();
+        parametricCurve.mulModel(new Mat4Transl(0, 0, 1.5));
 
         axisX = new AxisX();
         axisY = new AxisY();
@@ -69,7 +78,10 @@ public class Controller3D {
         solids.add(pyramid);
         solids.add(cylinder);
         solids.add(arrow);
-        solids.add(curve);
+        solids.add(curveBezier);
+        solids.add(curveFerguson);
+        solids.add(curveCoons);
+        solids.add(parametricCurve);
 
         initListeners();
 
@@ -80,17 +92,37 @@ public class Controller3D {
         panel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                // Šipky - posun X/Y aktivního tělesa
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    translateActive(0.2, 0, 0);
+                    translateActive(0.2, 0, 0); // X doprava
                 }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    translateActive(-0.2, 0, 0);
+                    translateActive(-0.2, 0, 0); // X doleva
                 }
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    translateActive(0, 0, 0.2);
+                    translateActive(0, 0.2, 0); // Y nahoru
                 }
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    translateActive(0, 0, -0.2);
+                    translateActive(0, -0.2, 0); // Y dolů
+                }
+                
+                // ArrowUp/ArrowDown - posun Z
+                // (UP/DOWN už jsou použity pro Y, takže ArrowUp/Down nejsou potřeba)
+                
+                // Klávesy X a Z jako alternativy pro pohyb v osách X a Z
+                if (e.getKeyCode() == KeyEvent.VK_X) {
+                    if (e.isShiftDown()) {
+                        translateActive(-0.2, 0, 0); // Shift+X doleva (osa X)
+                    } else {
+                        translateActive(0.2, 0, 0); // X doprava (osa X)
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_Z) {
+                    if (e.isShiftDown()) {
+                        translateActive(0, 0, -0.2); // Shift+Z dozadu (osa Z)
+                    } else {
+                        translateActive(0, 0, 0.2); // Z dopředu (osa Z)
+                    }
                 }
 
                 if (e.getKeyCode() == KeyEvent.VK_R) {
@@ -112,10 +144,18 @@ public class Controller3D {
                     rotateActiveY(-15);
                 }
 
-                if (e.getKeyCode() == KeyEvent.VK_EQUALS || e.getKeyCode() == KeyEvent.VK_PLUS) {
+                // Měřítko - podpora pro různé varianty + a -
+                char keyChar = e.getKeyChar();
+                if (e.getKeyCode() == KeyEvent.VK_EQUALS || 
+                    e.getKeyCode() == KeyEvent.VK_PLUS ||
+                    keyChar == '+' ||
+                    keyChar == '=') {
                     scaleActive(1.1);
                 }
-                if (e.getKeyCode() == KeyEvent.VK_MINUS) {
+                if (e.getKeyCode() == KeyEvent.VK_MINUS ||
+                    e.getKeyCode() == KeyEvent.VK_UNDERSCORE ||
+                    keyChar == '-' ||
+                    keyChar == '_') {
                     scaleActive(0.9);
                 }
 
@@ -225,9 +265,10 @@ public class Controller3D {
 
         renderer.setView(camera.getViewMatrix());
 
-        renderer.render(axisX);
-        renderer.render(axisY);
-        renderer.render(axisZ);
+        // Osy bez modelovací transformace (RGB barvy)
+        renderer.render(axisX, false);
+        renderer.render(axisY, false);
+        renderer.render(axisZ, false);
 
         renderer.render(cube);
         renderer.render(pyramid);
@@ -235,7 +276,12 @@ public class Controller3D {
 
         renderer.render(arrow);
 
-        renderer.render(curve);
+        // Kubiky zadané čtyřmi pevně zadanými body
+        renderer.render(curveBezier);
+        renderer.render(curveFerguson);
+        renderer.render(curveCoons);
+        
+        renderer.render(parametricCurve);
 
 
         panel.repaint();

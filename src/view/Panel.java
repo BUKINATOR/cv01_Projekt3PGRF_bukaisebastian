@@ -24,21 +24,36 @@ public class Panel extends JPanel {
         // Ovládací nápověda v levém horním rohu
         Graphics2D g2 = (Graphics2D) g.create();
         String[] lines = new String[]{
-                "Ovládání:",
-                "Tab - další těleso",
-                "Šipky - posun X/Y aktivního tělesa",
-                "ArrowUp/ArrowDown - posun Z",
-                "R/F - rotace kolem Z, T/G - kolem X, Y/H - kolem Y",
-                "+/- - měřítko aktivního tělesa",
-                "W/S/A/D - pohyb kamery",
-                "Drag myší - rozhlížení kamery",
-                "P - přepínání projekce (persp/ortho)"
+                "=== OVLÁDÁNÍ ===",
+                "",
+                "VÝBĚR TĚLESA:",
+                "  Tab - další těleso",
+                "",
+                "POSUN TĚLESA:",
+                "  ← →  - posun X (doleva/doprava)",
+                "  ↑ ↓  - posun Y (nahoru/dolů)",
+                "  X / Shift+X - posun X (alternativa)",
+                "  Z / Shift+Z - posun Z (dopředu/dozadu)",
+                "",
+                "ROTACE TĚLESA:",
+                "  R/F - rotace kolem osy Z",
+                "  T/G - rotace kolem osy X",
+                "  Y/H - rotace kolem osy Y",
+                "",
+                "MĚŘÍTKO:",
+                "  + / = - zvětšení",
+                "  - / _ - zmenšení",
+                "",
+                "KAMERA:",
+                "  W/S/A/D - pohyb kamery",
+                "  Drag myší - rozhlížení",
+                "  P - přepínání projekce (persp/ortho)"
         };
 
         int padding = 8;
         int lineHeight = g.getFontMetrics().getHeight();
         int blockHeight = lineHeight * lines.length + padding * 2;
-        int blockWidth = 340;
+        int blockWidth = 380;
 
         g2.setColor(new Color(0, 0, 0, 180));
         g2.fillRoundRect(6, 6, blockWidth, blockHeight, 10, 10);
